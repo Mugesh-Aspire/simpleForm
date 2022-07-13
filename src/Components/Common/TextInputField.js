@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
+import { isInvalidEmail } from './Functions'
 
 export default function TextInputField({
   name,
@@ -6,18 +7,26 @@ export default function TextInputField({
   value,
   onChange,
   errorMsg = '',
-  containerClassName = 'd-flex justify-content-center',
-  inputClassName = ''
+  containerClassName = '',
+  inputClassName = '',
+  errorFieldName
 }) {
   const [validate, setValidate] = useState(false)
-  const inputRef = useRef()
+
+  useEffect(() => {
+    if (errorFieldName && errorFieldName === name) {
+      checkFieldValidation()
+    } else {
+      setValidate(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errorFieldName])
 
   const checkFieldValidation = () => {
     if (!value) {
       setValidate(true)
-      if (inputRef.current) {
-        inputRef.current.focus()
-      }
+    }else if(value&&name==='email'&&isInvalidEmail(value) ){
+      setValidate(true)
     }
   }
   const updateInputField = (e) => {
@@ -29,7 +38,6 @@ export default function TextInputField({
   return (
     <div className={containerClassName}>
       <input
-        ref={inputRef}
         type={'text'}
         className={inputClassName}
         name={name}
